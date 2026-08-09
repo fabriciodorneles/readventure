@@ -25,7 +25,11 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run build
+      # Tenta habilitar o Pages automaticamente; se o token não tiver
+      # permissão, o site precisa ser habilitado uma única vez em
+      # Settings → Pages → Source: GitHub Actions.
       - uses: actions/configure-pages@v5
+        continue-on-error: true
         with:
           enablement: true
       - uses: actions/upload-pages-artifact@v3
