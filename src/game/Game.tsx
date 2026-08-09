@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { gameReducer, loadGameState, saveGameState } from './gameState';
 import type { TextCasePreference } from './gameState';
+import { MISSIONS } from './missions';
 import { AvatarCreator } from '../avatar/AvatarCreator';
-import { AdventurerHat } from '../avatar/Avatar';
+import { RewardArt } from '../avatar/Avatar';
+import { cosmeticById } from '../avatar/cosmetics';
 import { World } from '../world/World';
 import { ReadingChallenge } from '../reading/ReadingChallenge';
 import type { ChallengeDebugActions, EvaluationInfo } from '../reading/ReadingChallenge';
-import { getNextBridgePrompt } from '../content/readingPrompts';
+import { getNextPrompt } from '../content/readingPrompts';
 import type { ReadingPrompt } from '../content/readingPrompts';
 import { DebugPanel } from '../debug/DebugPanel';
 import { SettingsPanel } from '../settings/SettingsPanel';
@@ -28,8 +30,8 @@ export function Game() {
 
   const startReading = useCallback(() => {
     playSound('tap');
-    setCurrentPrompt(getNextBridgePrompt(state.completedPrompts));
-  }, [state.completedPrompts]);
+    setCurrentPrompt(getNextPrompt(state.completedPrompts, state.resources));
+  }, [state.completedPrompts, state.resources]);
 
   const handleReadingSuccess = useCallback((promptId: string) => {
     setCurrentPrompt(null);
@@ -49,18 +51,20 @@ export function Game() {
     );
   }
 
+  const rewardCosmetic = cosmeticById(MISSIONS[state.missionIndex].rewardId);
+
   return (
     <div className="app">
       <World
         state={state}
         onIntroDone={() => dispatch({ type: 'INTRO_DONE' })}
         onStartReading={startReading}
-        onBuildDone={() => dispatch({ type: 'BUILD_DONE' })}
-        onCross={() => {
+        onTransformDone={() => dispatch({ type: 'TRANSFORM_DONE' })}
+        onGo={() => {
           playSound('tap');
-          dispatch({ type: 'CROSS' });
+          dispatch({ type: 'GO' });
         }}
-        onCrossed={() => dispatch({ type: 'CROSSED' })}
+        onApproachDone={() => dispatch({ type: 'APPROACH_DONE' })}
         onOpenChest={() => {
           playSound('chest');
           dispatch({ type: 'OPEN_CHEST' });
@@ -71,6 +75,7 @@ export function Game() {
         <ReadingChallenge
           prompt={currentPrompt}
           textCase={state.textCase}
+          rewardEmoji={MISSIONS[state.missionIndex].resourceEmoji}
           onSuccess={handleReadingSuccess}
           onExit={() => setCurrentPrompt(null)}
           onEvaluated={setLastEval}
@@ -78,20 +83,18 @@ export function Game() {
         />
       )}
 
-      {state.phase === 'hat' && (
+      {state.phase === 'reward' && rewardCosmetic && (
         <div className="modal-backdrop reward-backdrop">
           <div className="reward-modal pop-in">
             <div className="reward-rays" />
-            <svg viewBox="18 0 84 42" width="220" className="reward-hat">
-              <AdventurerHat />
-            </svg>
-            <p className="reward-name">✨ CHAPÉU DE AVENTUREIRA ✨</p>
+            <RewardArt id={rewardCosmetic.id} />
+            <p className="reward-name">✨ {rewardCosmetic.name.toLocaleUpperCase('pt-BR')} ✨</p>
             <button
               type="button"
               className="big-button"
               onClick={() => {
                 playSound('equip');
-                dispatch({ type: 'EQUIP_HAT' });
+                dispatch({ type: 'EQUIP_REWARD' });
               }}
             >
               USAR!

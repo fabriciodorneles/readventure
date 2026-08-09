@@ -46,10 +46,12 @@ export interface SpeechRecognizer {
   listen(callbacks: ListenCallbacks): SpeechSession;
 }
 
+/** Tempo (ms) para a criança COMEÇAR a falar antes de encerrar a escuta */
+const INITIAL_SPEECH_TIMEOUT_MS = 10000;
 /** Silêncio (ms) após o último resultado antes de encerrar a escuta */
-const SILENCE_TIMEOUT_MS = 2600;
+const SILENCE_TIMEOUT_MS = 3000;
 /** Duração máxima de uma tentativa */
-const MAX_LISTEN_MS = 15000;
+const MAX_LISTEN_MS = 25000;
 
 export class BrowserSpeechRecognizer implements SpeechRecognizer {
   isAvailable(): boolean {
@@ -94,9 +96,9 @@ export class BrowserSpeechRecognizer implements SpeechRecognizer {
       }
     };
 
-    const armSilenceTimer = () => {
+    const armSilenceTimer = (ms: number) => {
       window.clearTimeout(silenceTimer);
-      silenceTimer = window.setTimeout(() => recognition.stop(), SILENCE_TIMEOUT_MS);
+      silenceTimer = window.setTimeout(() => recognition.stop(), ms);
     };
 
     recognition.onresult = (event) => {
@@ -108,7 +110,8 @@ export class BrowserSpeechRecognizer implements SpeechRecognizer {
         else interimTranscript += ' ' + text;
       }
       callbacks.onInterim?.((finalTranscript + ' ' + interimTranscript).trim());
-      armSilenceTimer();
+      // Depois que a fala começou, basta uma pausa curta para encerrar
+      armSilenceTimer(SILENCE_TIMEOUT_MS);
     };
 
     recognition.onerror = (event) => {
@@ -117,6 +120,8 @@ export class BrowserSpeechRecognizer implements SpeechRecognizer {
       clearTimers();
       if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
         callbacks.onError('denied');
+      } else if (event.error === 'audio-capture') {
+        callbacks.onError('unavailable');
       } else if (event.error === 'no-speech') {
         callbacks.onError('no-speech');
       } else if (event.error === 'aborted') {
@@ -135,7 +140,7 @@ export class BrowserSpeechRecognizer implements SpeechRecognizer {
       return { stop() {}, cancel() {} };
     }
 
-    armSilenceTimer();
+    armSilenceTimer(INITIAL_SPEECH_TIMEOUT_MS);
     maxTimer = window.setTimeout(() => recognition.stop(), MAX_LISTEN_MS);
 
     return {

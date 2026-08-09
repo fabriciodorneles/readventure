@@ -26,6 +26,8 @@ type Status = 'ready' | 'listening' | 'success' | 'retry' | 'no-speech' | 'denie
 type ReadingChallengeProps = {
   prompt: ReadingPrompt;
   textCase: TextCasePreference;
+  /** Emoji do recurso ganho nesta missão (🪵, 🌱, 💎...) */
+  rewardEmoji: string;
   onSuccess: (promptId: string) => void;
   onExit: () => void;
   onEvaluated?: (info: EvaluationInfo) => void;
@@ -37,6 +39,7 @@ const ENCOURAGEMENTS = ['CONSEGUIU!', 'BOA!', 'MUITO BEM!'];
 export function ReadingChallenge({
   prompt,
   textCase,
+  rewardEmoji,
   onSuccess,
   onExit,
   onEvaluated,
@@ -44,6 +47,7 @@ export function ReadingChallenge({
 }: ReadingChallengeProps) {
   const [status, setStatus] = useState<Status>('ready');
   const [attempt, setAttempt] = useState(0);
+  const [heard, setHeard] = useState('');
   const [lastResult, setLastResult] = useState<ReadingResult | null>(null);
   const [praise] = useState(() => ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)]);
   const sessionRef = useRef<SpeechSession | null>(null);
@@ -84,7 +88,9 @@ export function ReadingChallenge({
     }
     playSound('mic-on');
     setStatus('listening');
+    setHeard('');
     sessionRef.current = defaultRecognizer.listen({
+      onInterim: (text) => setHeard(text),
       onResult: (transcript) => {
         playSound('mic-off');
         handleTranscript(transcript);
@@ -153,7 +159,7 @@ export function ReadingChallenge({
         {status === 'success' && (
           <div className="feedback success pop-in">
             <span className="feedback-big">{praise}</span>
-            <span className="wood-reward">🪵 +1</span>
+            <span className="wood-reward">{rewardEmoji} +1</span>
           </div>
         )}
         {status === 'retry' && (
@@ -168,7 +174,12 @@ export function ReadingChallenge({
             <span className="feedback-small">FALE PERTINHO! 🎤</span>
           </div>
         )}
-        {status === 'listening' && <div className="feedback listening">ESTOU OUVINDO... 👂</div>}
+        {status === 'listening' && (
+          <div className="feedback listening-wrap">
+            <span className="feedback listening">ESTOU OUVINDO... 👂</span>
+            {heard && <span className="heard-text">{heard.toLocaleLowerCase('pt-BR')}</span>}
+          </div>
+        )}
         {status === 'ready' && <div className="feedback hint">TOQUE E LEIA EM VOZ ALTA</div>}
         {status === 'denied' && (
           <div className="feedback problem">

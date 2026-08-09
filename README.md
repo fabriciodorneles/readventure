@@ -2,10 +2,17 @@
 
 Um jogo de leitura para crianças onde **ler em voz alta é a mecânica principal**.
 
-A criança explora um mundo de aventura, encontra uma ponte quebrada e precisa
-juntar 5 madeiras — cada madeira é conquistada lendo uma palavra ou frase em voz
-alta (reconhecimento de fala em pt-BR). A ponte se reconstrói visivelmente,
-revela uma nova área e um baú com um chapéu de aventureira. 🎩
+A criança explora um mundo de aventura em três missões — cada recurso é
+conquistado lendo uma palavra ou frase em voz alta (reconhecimento de fala em
+pt-BR), e o mundo muda visivelmente por causa da leitura:
+
+1. **A Ponte Quebrada** 🪵 — 5 madeiras reconstroem a ponte → chapéu de aventureira
+2. **O Jardim Seco** 🌱 — 5 sementes fazem o jardim florescer → mochila de exploradora
+3. **A Torre Trancada** 💎 — 5 cristais abrem a porta da torre → capa mágica
+
+As leituras são sorteadas de um banco de ~65 textos (palavras, frases simples e
+frases longas), com gradação de dificuldade dentro de cada missão e sem repetir
+textos já lidos até esgotar o banco.
 
 ## Rodando localmente
 

@@ -22,8 +22,8 @@ export function DebugPanel({
     <div className="debug-panel">
       <div className="debug-title">DEBUG</div>
       <div>
-        phase: <b>{state.phase}</b> | wood: {state.wood}/{state.woodGoal} | bridge:{' '}
-        {state.bridgeBuilt ? 'yes' : 'no'}
+        mission: <b>{state.missionIndex + 1}</b> | phase: <b>{state.phase}</b> | resources:{' '}
+        {state.resources}
       </div>
       {lastEval ? (
         <div className="debug-eval">
