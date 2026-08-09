@@ -3,7 +3,7 @@ import { gameReducer, loadGameState, saveGameState } from './gameState';
 import type { TextCasePreference } from './gameState';
 import { MISSIONS } from './missions';
 import { AvatarCreator } from '../avatar/AvatarCreator';
-import { RewardArt } from '../avatar/Avatar';
+import { RewardModal } from './RewardModal';
 import { cosmeticById } from '../avatar/cosmetics';
 import { World } from '../world/World';
 import { ReadingChallenge } from '../reading/ReadingChallenge';
@@ -84,23 +84,15 @@ export function Game() {
       )}
 
       {state.phase === 'reward' && rewardCosmetic && (
-        <div className="modal-backdrop reward-backdrop">
-          <div className="reward-modal pop-in">
-            <div className="reward-rays" />
-            <RewardArt id={rewardCosmetic.id} />
-            <p className="reward-name">✨ {rewardCosmetic.name.toLocaleUpperCase('pt-BR')} ✨</p>
-            <button
-              type="button"
-              className="big-button"
-              onClick={() => {
-                playSound('equip');
-                dispatch({ type: 'EQUIP_REWARD' });
-              }}
-            >
-              USAR!
-            </button>
-          </div>
-        </div>
+        <RewardModal
+          cosmetic={rewardCosmetic}
+          textCase={state.textCase}
+          debugEnabled={DEBUG_ENABLED}
+          onEquip={() => {
+            playSound('equip');
+            dispatch({ type: 'EQUIP_REWARD' });
+          }}
+        />
       )}
 
       <button

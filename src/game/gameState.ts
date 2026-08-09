@@ -13,6 +13,9 @@ export type EquippedCosmetics = {
   hat?: string;
   back?: string;
   cape?: string;
+  boots?: string;
+  glasses?: string;
+  hand?: string;
 };
 
 /**
@@ -150,6 +153,12 @@ function sanitize(state: GameState): GameState {
   // Fases transitórias de animação voltam para um estado estável
   if (state.phase === 'approach') state.phase = 'transformed';
   if (state.phase === 'reward') state.phase = 'chest';
+  // Save antigo "completo" quando novas missões foram adicionadas: continua nelas
+  if (state.phase === 'complete' && state.missionIndex < MISSIONS.length - 1) {
+    state.missionIndex += 1;
+    state.resources = 0;
+    state.phase = 'intro';
+  }
   return state;
 }
 

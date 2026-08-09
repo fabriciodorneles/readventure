@@ -520,6 +520,81 @@ button {
   animation-duration: 8s;
 }
 
+.lantern-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: pop-in 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.bat-swing {
+  transform-origin: 50% 0%;
+  animation: bat-swing 3.2s ease-in-out infinite;
+}
+
+@keyframes bat-swing {
+  0%,
+  100% {
+    transform: rotate(-5deg);
+  }
+  50% {
+    transform: rotate(5deg);
+  }
+}
+
+.band-pop {
+  animation: band-pop 0.8s ease;
+}
+
+@keyframes band-pop {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.balloon-inflate {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: balloon-inflate 2.2s cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+@keyframes balloon-inflate {
+  0% {
+    transform: scale(0.15);
+    opacity: 0;
+  }
+  40% {
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.bird {
+  animation: bird-fly 18s linear infinite;
+}
+
+.bird.b2 {
+  animation-delay: 6s;
+  animation-duration: 24s;
+}
+
+@keyframes bird-fly {
+  0% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(560px) translateY(-30px);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
+
 @keyframes firefly {
   0%,
   100% {
@@ -928,6 +1003,36 @@ button {
   font-weight: 800;
   color: var(--brown);
   text-align: center;
+  letter-spacing: 0.04em;
+}
+
+.reward-read {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.reward-read-hint {
+  font-size: clamp(1rem, 2.4vw, 1.3rem);
+  font-weight: 700;
+  color: #a0714a;
+}
+
+.mic-button.small {
+  width: clamp(70px, 10vh, 90px);
+  height: clamp(70px, 10vh, 90px);
+  font-size: clamp(1.8rem, 4.5vh, 2.5rem);
+}
+
+.reward-debug {
+  font-size: 11px;
+  font-family: ui-monospace, monospace;
+  background: #2a3b4d;
+  color: #cfe3f5;
+  border-radius: 6px;
+  padding: 0.3em 0.6em;
 }
 
 /* ---------- área dos pais ---------- */

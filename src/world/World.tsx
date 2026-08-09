@@ -4,6 +4,9 @@ import { MISSIONS } from '../game/missions';
 import { BridgeScene } from './BridgeScene';
 import { GardenScene } from './GardenScene';
 import { TowerScene } from './TowerScene';
+import { CaveScene } from './CaveScene';
+import { BalloonScene } from './BalloonScene';
+import { RainbowScene } from './RainbowScene';
 import { playSound } from '../audio/sounds';
 
 type WorldProps = {
@@ -61,6 +64,9 @@ export function World({
         {missionIndex === 0 && <BridgeScene state={state} onOpenChest={onOpenChest} />}
         {missionIndex === 1 && <GardenScene state={state} onOpenChest={onOpenChest} />}
         {missionIndex === 2 && <TowerScene state={state} onOpenChest={onOpenChest} />}
+        {missionIndex === 3 && <CaveScene state={state} onOpenChest={onOpenChest} />}
+        {missionIndex === 4 && <BalloonScene state={state} onOpenChest={onOpenChest} />}
+        {missionIndex === 5 && <RainbowScene state={state} onOpenChest={onOpenChest} />}
       </svg>
 
       {/* HUD do recurso da missão */}

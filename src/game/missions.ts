@@ -1,5 +1,5 @@
 export type MissionDef = {
-  id: 'bridge' | 'garden' | 'tower';
+  id: 'bridge' | 'garden' | 'tower' | 'cave' | 'balloon' | 'rainbow';
   /** Emoji do recurso coletado (HUD e recompensa de leitura) */
   resourceEmoji: string;
   goal: number;
@@ -37,5 +37,32 @@ export const MISSIONS: MissionDef[] = [
     introLines: ['A TORRE ESTÁ TRANCADA!', 'PRECISAMOS DE 5 CRISTAIS!'],
     celebrateLine: 'A PORTA ABRIU! ✨',
     actionLabel: 'ENTRAR NA TORRE →',
+  },
+  {
+    id: 'cave',
+    resourceEmoji: '🏮',
+    goal: 5,
+    rewardId: 'boots-fast',
+    introLines: ['QUE CAVERNA ESCURA!', 'VAMOS ACENDER 5 LAMPIÕES!'],
+    celebrateLine: 'QUE BRILHO! ✨',
+    actionLabel: 'EXPLORAR A CAVERNA →',
+  },
+  {
+    id: 'balloon',
+    resourceEmoji: '🎈',
+    goal: 5,
+    rewardId: 'glasses-magic',
+    introLines: ['O BALÃO ESTÁ FURADO!', 'PRECISAMOS DE 5 REMENDOS!'],
+    celebrateLine: 'O BALÃO ENCHEU! 🎈',
+    actionLabel: 'SUBIR NO BALÃO →',
+  },
+  {
+    id: 'rainbow',
+    resourceEmoji: '🎨',
+    goal: 5,
+    rewardId: 'wand-stars',
+    introLines: ['O ARCO-ÍRIS APAGOU!', 'VAMOS PINTAR COM 5 CORES!'],
+    celebrateLine: 'QUE LINDO! 🌈',
+    actionLabel: 'SEGUIR O ARCO-ÍRIS →',
   },
 ];
