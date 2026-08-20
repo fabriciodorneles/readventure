@@ -1,63 +1,62 @@
 # Readventure 🦊📖
 
-> 🇺🇸 [English version](README.en.md)
+> 🇧🇷 [Versão em português](README.pt-BR.md)
 
-Um jogo de leitura para crianças onde **ler em voz alta é a mecânica principal**.
+A reading game for children where **reading aloud is the core game mechanic**.
 
-**Jogar agora**: https://fabriciodorneles.github.io/readventure/
+**Play now**: https://fabriciodorneles.github.io/readventure/
 
-A criança explora um mundo de aventura em seis missões — cada recurso é
-conquistado lendo uma palavra ou frase em voz alta (reconhecimento de fala do
-navegador), e o mundo muda visivelmente por causa da leitura:
+The child explores an adventure world across six missions — every resource is
+earned by reading a word or sentence out loud (browser speech recognition), and
+the world visibly changes because of the reading:
 
-1. **A Ponte Quebrada** 🪵 — 5 madeiras reconstroem a ponte → chapéu de aventureira
-2. **O Jardim Seco** 🌱 — cada leitura faz um canteiro florescer → mochila de exploradora
-3. **A Torre Trancada** 💎 — cada leitura acende um cristal na porta → capa mágica
-4. **A Caverna Escura** 🏮 — cada lampião aceso clareia a caverna → botas velozes
-5. **O Balão Furado** 🎈 — cada leitura cola um remendo até o balão encher → óculos mágicos
-6. **O Arco-Íris Apagado** 🌈 — cada leitura pinta uma faixa do arco-íris → varinha de estrelas
+1. **The Broken Bridge** 🪵 — 5 pieces of wood rebuild the bridge → adventurer hat
+2. **The Dry Garden** 🌱 — each reading makes a flower bed bloom → explorer backpack
+3. **The Locked Tower** 💎 — each reading lights a crystal on the door → magic cape
+4. **The Dark Cave** 🏮 — each lantern lit brightens the cave → speedy boots
+5. **The Punctured Balloon** 🎈 — each reading patches the balloon until it inflates → magic glasses
+6. **The Faded Rainbow** 🌈 — each reading paints one band of the rainbow → star wand
 
-Para abrir cada prêmio, a criança lê o nome dele em voz alta. As leituras são
-sorteadas de um banco de textos (palavras, frases simples e frases longas), com
-gradação de dificuldade dentro de cada missão e sem repetir textos já lidos.
+To claim each prize, the child reads its name out loud. Readings are drawn from
+a bank of texts (words, simple sentences, longer sentences), with difficulty
+progression inside each mission and no repeats until the bank runs out.
 
-**Idiomas**: Português (pt-BR) e Inglês (en-US) — configurável na área dos pais
-(⚙), incluindo o idioma do reconhecimento de voz.
+**Languages**: Portuguese (pt-BR) and English (en-US) — switchable in the
+parent area (⚙), including the speech recognition language.
 
-## Rodando localmente
+## Running locally
 
 ```bash
 npm install
 npm run dev
 ```
 
-Abra a URL indicada (o reconhecimento de fala funciona melhor no **Chrome/Edge**;
-o microfone exige `localhost` ou HTTPS).
+Open the printed URL (speech recognition works best in **Chrome/Edge**; the
+microphone requires `localhost` or HTTPS).
 
-## Modo debug
+## Debug mode
 
-Adicione `?debug=true` à URL para ver o painel de desenvolvimento:
-texto esperado, texto reconhecido, similaridade, e botões para simular
-acerto/erro sem usar o microfone.
+Append `?debug=true` to the URL to see the developer panel: expected text,
+recognized text, similarity score, and buttons to simulate success/failure
+without using the microphone.
 
 ## Deploy
 
-O deploy é automático via GitHub Actions para o GitHub Pages a cada push
-(workflow em `.github/workflows/deploy.yml`).
+Deploys automatically to GitHub Pages via GitHub Actions on every push
+(workflow in `.github/workflows/deploy.yml`).
 
-> Configuração única necessária: em **Settings → Pages**, definir
-> **Source: GitHub Actions**.
+> One-time setup: in **Settings → Pages**, set **Source: GitHub Actions**.
 
-## Arquitetura (resumo)
+## Architecture (overview)
 
-- `src/game/` — máquina de estados das missões + persistência em localStorage
-- `src/world/` — cenas SVG animadas (uma por missão)
-- `src/avatar/` — avatar customizável e cosméticos equipáveis
-- `src/reading/` — desafio de leitura; reconhecimento de fala isolado atrás da
-  interface `SpeechRecognizer` e avaliação atrás de `SpeechEvaluator`
-  (substituíveis por um serviço de avaliação de pronúncia no futuro)
-- `src/content/` — prompts de leitura como dados estruturados (pt e en)
-- `src/i18n/` — textos da interface em pt-BR e inglês
-- `src/debug/` — painel de desenvolvimento (`?debug=true`)
+- `src/game/` — mission state machine + localStorage persistence
+- `src/world/` — animated SVG scenes (one per mission)
+- `src/avatar/` — customizable avatar and equippable cosmetics
+- `src/reading/` — reading challenge; speech recognition isolated behind the
+  `SpeechRecognizer` interface and scoring behind `SpeechEvaluator`
+  (swappable for a real pronunciation assessment service later)
+- `src/content/` — reading prompts as structured data (pt and en)
+- `src/i18n/` — UI strings in Portuguese and English
+- `src/debug/` — developer panel (`?debug=true`)
 
-Sem backend, sem contas, sem armazenamento de áudio. Licença [MIT](LICENSE).
+No backend, no accounts, no audio storage. [MIT](LICENSE) licensed.
