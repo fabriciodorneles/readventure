@@ -43,7 +43,7 @@ export type SpeechSession = { stop(): void; cancel(): void };
 
 export interface SpeechRecognizer {
   isAvailable(): boolean;
-  listen(callbacks: ListenCallbacks): SpeechSession;
+  listen(callbacks: ListenCallbacks, locale?: string): SpeechSession;
 }
 
 /** Tempo (ms) para a criança COMEÇAR a falar antes de encerrar a escuta */
@@ -58,7 +58,7 @@ export class BrowserSpeechRecognizer implements SpeechRecognizer {
     return Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
   }
 
-  listen(callbacks: ListenCallbacks): SpeechSession {
+  listen(callbacks: ListenCallbacks, locale = 'pt-BR'): SpeechSession {
     const Impl = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Impl) {
       callbacks.onError('unavailable');
@@ -66,7 +66,7 @@ export class BrowserSpeechRecognizer implements SpeechRecognizer {
     }
 
     const recognition = new Impl();
-    recognition.lang = 'pt-BR';
+    recognition.lang = locale;
     // continuous + interim: a criança pode ler devagar, em pedaços
     // (BOR... BORBO... BORBOLETA) sem que a escuta seja cortada.
     recognition.continuous = true;

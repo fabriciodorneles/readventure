@@ -7,12 +7,15 @@ import { defaultRecognizer } from '../reading/speechRecognition';
 import type { SpeechSession } from '../reading/speechRecognition';
 import { defaultEvaluator } from '../reading/speechEvaluator';
 import { playSound } from '../audio/sounds';
+import { getStrings, speechLocale } from '../i18n/strings';
+import type { Lang } from '../i18n/strings';
 
 type Status = 'ready' | 'listening' | 'retry' | 'unlocked';
 
 type RewardModalProps = {
   cosmetic: Cosmetic;
   textCase: TextCasePreference;
+  lang: Lang;
   debugEnabled: boolean;
   onEquip: () => void;
 };
@@ -21,12 +24,14 @@ type RewardModalProps = {
  * Modal do prêmio: para ganhar, a criança lê o nome do item em voz alta.
  * Se o microfone não estiver disponível, o item é liberado direto.
  */
-export function RewardModal({ cosmetic, textCase, debugEnabled, onEquip }: RewardModalProps) {
+export function RewardModal({ cosmetic, textCase, lang, debugEnabled, onEquip }: RewardModalProps) {
+  const t = getStrings(lang);
   const [status, setStatus] = useState<Status>('ready');
   const [attempt, setAttempt] = useState(0);
   const sessionRef = useRef<SpeechSession | null>(null);
 
-  const displayName = applyTextCase(cosmetic.name, textCase);
+  const cosmeticName = cosmetic.name[lang];
+  const displayName = applyTextCase(cosmeticName, textCase);
   const micAvailable = defaultRecognizer.isAvailable();
 
   const unlock = () => {
@@ -35,7 +40,7 @@ export function RewardModal({ cosmetic, textCase, debugEnabled, onEquip }: Rewar
   };
 
   const handleTranscript = (transcript: string) => {
-    const result = defaultEvaluator.evaluate(cosmetic.name, transcript);
+    const result = defaultEvaluator.evaluate(cosmeticName, transcript);
     if (result.outcome === 'success' || (result.outcome === 'soft' && attempt >= 1)) {
       unlock();
     } else {
@@ -52,19 +57,22 @@ export function RewardModal({ cosmetic, textCase, debugEnabled, onEquip }: Rewar
     }
     playSound('mic-on');
     setStatus('listening');
-    sessionRef.current = defaultRecognizer.listen({
-      onResult: (transcript) => {
-        playSound('mic-off');
-        handleTranscript(transcript);
+    sessionRef.current = defaultRecognizer.listen(
+      {
+        onResult: (transcript) => {
+          playSound('mic-off');
+          handleTranscript(transcript);
+        },
+        onError: (error) => {
+          if (error === 'denied' || error === 'unavailable') unlock();
+          else {
+            setStatus('retry');
+            playSound('retry');
+          }
+        },
       },
-      onError: (error) => {
-        if (error === 'denied' || error === 'unavailable') unlock();
-        else {
-          setStatus('retry');
-          playSound('retry');
-        }
-      },
-    });
+      speechLocale[lang],
+    );
   };
 
   useEffect(
@@ -90,16 +98,12 @@ export function RewardModal({ cosmetic, textCase, debugEnabled, onEquip }: Rewar
               onEquip();
             }}
           >
-            USAR!
+            {t.wear}
           </button>
         ) : (
           <div className="reward-read">
             <span className="reward-read-hint">
-              {status === 'listening'
-                ? 'ESTOU OUVINDO... 👂'
-                : status === 'retry'
-                  ? 'QUASE! LEIA O NOME DE NOVO.'
-                  : 'LEIA O NOME PARA GANHAR!'}
+              {status === 'listening' ? t.listening : status === 'retry' ? t.readNameRetry : t.readNameToWin}
             </span>
             <button
               type="button"

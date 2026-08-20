@@ -1,18 +1,20 @@
+import type { Lang } from '../i18n/strings';
+
 export type CosmeticSlot = 'hat' | 'back' | 'cape' | 'boots' | 'glasses' | 'hand';
 
 export type Cosmetic = {
   id: string;
-  name: string;
+  name: Record<Lang, string>;
   slot: CosmeticSlot;
 };
 
 export const cosmetics: Cosmetic[] = [
-  { id: 'hat-adventurer', name: 'Chapéu de Aventureira', slot: 'hat' },
-  { id: 'back-explorer', name: 'Mochila de Exploradora', slot: 'back' },
-  { id: 'cape-magic', name: 'Capa Mágica', slot: 'cape' },
-  { id: 'boots-fast', name: 'Botas Velozes', slot: 'boots' },
-  { id: 'glasses-magic', name: 'Óculos Mágicos', slot: 'glasses' },
-  { id: 'wand-stars', name: 'Varinha de Estrelas', slot: 'hand' },
+  { id: 'hat-adventurer', name: { pt: 'Chapéu de Aventureira', en: 'Adventurer Hat' }, slot: 'hat' },
+  { id: 'back-explorer', name: { pt: 'Mochila de Exploradora', en: 'Explorer Backpack' }, slot: 'back' },
+  { id: 'cape-magic', name: { pt: 'Capa Mágica', en: 'Magic Cape' }, slot: 'cape' },
+  { id: 'boots-fast', name: { pt: 'Botas Velozes', en: 'Speedy Boots' }, slot: 'boots' },
+  { id: 'glasses-magic', name: { pt: 'Óculos Mágicos', en: 'Magic Glasses' }, slot: 'glasses' },
+  { id: 'wand-stars', name: { pt: 'Varinha de Estrelas', en: 'Star Wand' }, slot: 'hand' },
 ];
 
 export function cosmeticById(id: string): Cosmetic | undefined {

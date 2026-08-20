@@ -3,8 +3,17 @@ import type { AvatarConfig } from '../game/gameState';
 import { hairStyles, shirtColors, skinTones } from './cosmetics';
 import { AvatarPreview } from './Avatar';
 import { playSound } from '../audio/sounds';
+import { getStrings } from '../i18n/strings';
+import type { Lang } from '../i18n/strings';
 
-export function AvatarCreator({ onDone }: { onDone: (avatar: AvatarConfig) => void }) {
+export function AvatarCreator({
+  lang,
+  onDone,
+}: {
+  lang: Lang;
+  onDone: (avatar: AvatarConfig) => void;
+}) {
+  const t = getStrings(lang);
   const [skin, setSkin] = useState(0);
   const [hair, setHair] = useState(0);
   const [shirt, setShirt] = useState(0);
@@ -12,13 +21,13 @@ export function AvatarCreator({ onDone }: { onDone: (avatar: AvatarConfig) => vo
 
   return (
     <div className="avatar-creator">
-      <h1 className="avatar-creator-title">QUEM É VOCÊ?</h1>
+      <h1 className="avatar-creator-title">{t.whoAreYou}</h1>
       <div className="avatar-creator-body">
         <div className="avatar-creator-preview">
           <AvatarPreview config={config} width={190} />
         </div>
         <div className="avatar-creator-options">
-          <OptionRow label="PELE">
+          <OptionRow label={t.skin}>
             {skinTones.map((tone, i) => (
               <button
                 key={tone}
@@ -33,7 +42,7 @@ export function AvatarCreator({ onDone }: { onDone: (avatar: AvatarConfig) => vo
               />
             ))}
           </OptionRow>
-          <OptionRow label="CABELO">
+          <OptionRow label={t.hair}>
             {hairStyles.map((style, i) => (
               <button
                 key={style.name}
@@ -49,7 +58,7 @@ export function AvatarCreator({ onDone }: { onDone: (avatar: AvatarConfig) => vo
               </button>
             ))}
           </OptionRow>
-          <OptionRow label="CAMISETA">
+          <OptionRow label={t.shirt}>
             {shirtColors.map((color, i) => (
               <button
                 key={color}
@@ -74,7 +83,7 @@ export function AvatarCreator({ onDone }: { onDone: (avatar: AvatarConfig) => vo
           onDone(config);
         }}
       >
-        COMEÇAR! 🚀
+        {t.start}
       </button>
     </div>
   );

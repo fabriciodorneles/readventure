@@ -8,6 +8,7 @@ import { CaveScene } from './CaveScene';
 import { BalloonScene } from './BalloonScene';
 import { RainbowScene } from './RainbowScene';
 import { playSound } from '../audio/sounds';
+import { getStrings } from '../i18n/strings';
 
 type WorldProps = {
   state: GameState;
@@ -28,8 +29,10 @@ export function World({
   onApproachDone,
   onOpenChest,
 }: WorldProps) {
-  const { phase, missionIndex } = state;
+  const { phase, missionIndex, language } = state;
   const mission = MISSIONS[missionIndex];
+  const t = getStrings(language);
+  const introLines = mission.introLines[language];
   const [introStep, setIntroStep] = useState(0);
 
   // Nova missão: recomeça o diálogo de introdução
@@ -54,7 +57,7 @@ export function World({
 
   const advanceIntro = () => {
     playSound('tap');
-    if (introStep < mission.introLines.length - 1) setIntroStep(introStep + 1);
+    if (introStep < introLines.length - 1) setIntroStep(introStep + 1);
     else onIntroDone();
   };
 
@@ -79,35 +82,35 @@ export function World({
       {/* balões de fala */}
       {phase === 'intro' && (
         <button type="button" className="speech-bubble" style={{ left: '30%', top: '52%' }} onClick={advanceIntro}>
-          {mission.introLines[introStep]}
+          {introLines[introStep]}
           <span className="bubble-hint">▶</span>
         </button>
       )}
       {phase === 'transformed' && (
         <div className="speech-bubble static" style={{ left: '30%', top: '52%' }}>
-          {mission.celebrateLine}
+          {mission.celebrateLine[language]}
         </div>
       )}
       {phase === 'chest' && (
         <div className="speech-bubble static" style={{ left: '58%', top: '55%' }}>
-          ABRA O BAÚ! ✨
+          {t.openChest}
         </div>
       )}
       {phase === 'complete' && (
         <div className="speech-bubble static" style={{ right: '3%', top: '10%' }}>
-          NOVA AVENTURA EM BREVE ✨
+          {t.newAdventure}
         </div>
       )}
 
       {/* ações principais */}
       {phase === 'collecting' && (
         <button type="button" className="big-button world-action pulse" onClick={onStartReading}>
-          📖 LER!
+          {t.read}
         </button>
       )}
       {phase === 'transformed' && (
         <button type="button" className="big-button world-action" onClick={onGo}>
-          {mission.actionLabel}
+          {mission.actionLabel[language]}
         </button>
       )}
     </div>

@@ -1,21 +1,53 @@
 import type { TextCasePreference } from '../game/gameState';
+import { getStrings } from '../i18n/strings';
+import type { Lang } from '../i18n/strings';
 
 type SettingsPanelProps = {
   textCase: TextCasePreference;
+  lang: Lang;
   onTextCaseChange: (value: TextCasePreference) => void;
+  onLanguageChange: (value: Lang) => void;
   onResetProgress: () => void;
   onClose: () => void;
 };
 
 /** Área dos pais: discreta, fora do fluxo da criança. */
-export function SettingsPanel({ textCase, onTextCaseChange, onResetProgress, onClose }: SettingsPanelProps) {
+export function SettingsPanel({
+  textCase,
+  lang,
+  onTextCaseChange,
+  onLanguageChange,
+  onResetProgress,
+  onClose,
+}: SettingsPanelProps) {
+  const t = getStrings(lang);
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="settings-panel" onClick={(e) => e.stopPropagation()}>
-        <h2>Área dos pais</h2>
+        <h2>{t.parentArea}</h2>
 
         <div className="settings-group">
-          <span className="settings-label">Estilo do texto</span>
+          <span className="settings-label">{t.language}</span>
+          <div className="lang-choices">
+            <button
+              type="button"
+              className={`lang-button ${lang === 'pt' ? 'selected' : ''}`}
+              onClick={() => onLanguageChange('pt')}
+            >
+              🇧🇷 Português
+            </button>
+            <button
+              type="button"
+              className={`lang-button ${lang === 'en' ? 'selected' : ''}`}
+              onClick={() => onLanguageChange('en')}
+            >
+              🇺🇸 English
+            </button>
+          </div>
+        </div>
+
+        <div className="settings-group">
+          <span className="settings-label">{t.textStyle}</span>
           <label className="settings-radio">
             <input
               type="radio"
@@ -23,7 +55,7 @@ export function SettingsPanel({ textCase, onTextCaseChange, onResetProgress, onC
               checked={textCase === 'uppercase'}
               onChange={() => onTextCaseChange('uppercase')}
             />
-            MAIÚSCULAS
+            {t.uppercase}
           </label>
           <label className="settings-radio">
             <input
@@ -32,7 +64,7 @@ export function SettingsPanel({ textCase, onTextCaseChange, onResetProgress, onC
               checked={textCase === 'sentence-case'}
               onChange={() => onTextCaseChange('sentence-case')}
             />
-            Normal
+            {t.normalCase}
           </label>
         </div>
 
@@ -41,18 +73,18 @@ export function SettingsPanel({ textCase, onTextCaseChange, onResetProgress, onC
             type="button"
             className="settings-danger"
             onClick={() => {
-              if (window.confirm('Apagar todo o progresso da aventura?')) {
+              if (window.confirm(t.resetConfirm)) {
                 onResetProgress();
                 onClose();
               }
             }}
           >
-            Recomeçar aventura do zero
+            {t.resetAdventure}
           </button>
         </div>
 
         <button type="button" className="settings-close" onClick={onClose}>
-          Fechar
+          {t.close}
         </button>
       </div>
     </div>

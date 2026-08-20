@@ -1,5 +1,6 @@
 import { MISSIONS } from './missions';
 import { cosmeticById } from '../avatar/cosmetics';
+import type { Lang } from '../i18n/strings';
 
 export type TextCasePreference = 'uppercase' | 'sentence-case';
 
@@ -45,6 +46,7 @@ export type GameState = {
   equippedCosmetics: EquippedCosmetics;
   completedPrompts: string[];
   textCase: TextCasePreference;
+  language: Lang;
 };
 
 export const initialGameState: GameState = {
@@ -56,6 +58,7 @@ export const initialGameState: GameState = {
   equippedCosmetics: {},
   completedPrompts: [],
   textCase: 'uppercase',
+  language: 'pt',
 };
 
 export type GameAction =
@@ -68,6 +71,7 @@ export type GameAction =
   | { type: 'OPEN_CHEST' }
   | { type: 'EQUIP_REWARD' }
   | { type: 'SET_TEXT_CASE'; value: TextCasePreference }
+  | { type: 'SET_LANGUAGE'; value: Lang }
   | { type: 'RESET' };
 
 export function gameReducer(state: GameState, action: GameAction): GameState {
@@ -124,8 +128,10 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
     }
     case 'SET_TEXT_CASE':
       return { ...state, textCase: action.value };
+    case 'SET_LANGUAGE':
+      return { ...state, language: action.value };
     case 'RESET':
-      return { ...initialGameState, textCase: state.textCase };
+      return { ...initialGameState, textCase: state.textCase, language: state.language };
     default:
       return state;
   }

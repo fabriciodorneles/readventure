@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
 import { gameReducer, loadGameState, saveGameState } from './gameState';
 import type { TextCasePreference } from './gameState';
+import type { Lang } from '../i18n/strings';
 import { MISSIONS } from './missions';
 import { AvatarCreator } from '../avatar/AvatarCreator';
 import { RewardModal } from './RewardModal';
@@ -30,8 +31,8 @@ export function Game() {
 
   const startReading = useCallback(() => {
     playSound('tap');
-    setCurrentPrompt(getNextPrompt(state.completedPrompts, state.resources));
-  }, [state.completedPrompts, state.resources]);
+    setCurrentPrompt(getNextPrompt(state.completedPrompts, state.resources, state.language));
+  }, [state.completedPrompts, state.resources, state.language]);
 
   const handleReadingSuccess = useCallback((promptId: string) => {
     setCurrentPrompt(null);
@@ -46,7 +47,7 @@ export function Game() {
   if (!state.avatar || state.phase === 'avatar-setup') {
     return (
       <div className="app">
-        <AvatarCreator onDone={(avatar) => dispatch({ type: 'CREATE_AVATAR', avatar })} />
+        <AvatarCreator lang={state.language} onDone={(avatar) => dispatch({ type: 'CREATE_AVATAR', avatar })} />
       </div>
     );
   }
@@ -75,6 +76,7 @@ export function Game() {
         <ReadingChallenge
           prompt={currentPrompt}
           textCase={state.textCase}
+          lang={state.language}
           rewardEmoji={MISSIONS[state.missionIndex].resourceEmoji}
           onSuccess={handleReadingSuccess}
           onExit={() => setCurrentPrompt(null)}
@@ -87,6 +89,7 @@ export function Game() {
         <RewardModal
           cosmetic={rewardCosmetic}
           textCase={state.textCase}
+          lang={state.language}
           debugEnabled={DEBUG_ENABLED}
           onEquip={() => {
             playSound('equip');
@@ -107,7 +110,9 @@ export function Game() {
       {settingsOpen && (
         <SettingsPanel
           textCase={state.textCase}
+          lang={state.language}
           onTextCaseChange={(value: TextCasePreference) => dispatch({ type: 'SET_TEXT_CASE', value })}
+          onLanguageChange={(value: Lang) => dispatch({ type: 'SET_LANGUAGE', value })}
           onResetProgress={resetProgress}
           onClose={() => setSettingsOpen(false)}
         />

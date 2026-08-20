@@ -1100,6 +1100,28 @@ button {
   accent-color: var(--green);
 }
 
+.lang-choices {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.lang-button {
+  flex: 1;
+  font-size: 1.05rem;
+  font-weight: 700;
+  padding: 0.6em 0.8em;
+  border-radius: 12px;
+  background: #f0f3f6;
+  color: var(--ink);
+  border: 3px solid transparent;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.lang-button.selected {
+  border-color: var(--green);
+  background: #e8f8ee;
+}
+
 .settings-danger {
   background: #fdecea;
   color: #c0392b;

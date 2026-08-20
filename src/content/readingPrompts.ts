@@ -1,7 +1,10 @@
+import type { Lang } from '../i18n/strings';
+
 export type ReadingPrompt = {
   id: string;
   /** Texto em caixa normal; a exibição aplica a preferência de caixa. */
   text: string;
+  lang: Lang;
   difficulty: 1 | 2 | 3;
   type: 'word' | 'sentence';
   tags?: string[];
@@ -84,6 +87,63 @@ const longSentences: Array<[string, string[]?]> = [
   ['O barco navegou pelo rio até a cachoeira.', ['ch', 'accents']],
 ];
 
+const enWords: Array<[string, string[]?]> = [
+  ['Butterfly', ['long_word']],
+  ['Bicycle'],
+  ['Rainbow'],
+  ['Forest'],
+  ['Window'],
+  ['Treasure'],
+  ['Adventure', ['long_word']],
+  ['Popcorn'],
+  ['Star'],
+  ['Rocket'],
+  ['Monkey'],
+  ['Castle'],
+  ['Pirate'],
+  ['Turtle'],
+  ['Dinosaur', ['long_word']],
+  ['Balloon'],
+  ['Garden'],
+  ['Dragon'],
+  ['Cookie'],
+  ['Puppy'],
+];
+
+const enShortSentences: Array<[string, string[]?]> = [
+  ['The cat climbed the tree.'],
+  ['The girl opened the door.'],
+  ['The dog ran outside.'],
+  ['The fox went into the forest.'],
+  ['The bird landed on the window.'],
+  ['The sun shines in the sky.'],
+  ['The bee flies to the flower.'],
+  ['The fish swims in the river.'],
+  ['The frog jumped in the pond.'],
+  ['The cake is in the oven.'],
+  ['The rain fell on the garden.'],
+  ['The boy plays with the ball.'],
+  ['The duck swims in the lake.'],
+  ['The wind moves the leaves.'],
+  ['The monkey eats a banana.'],
+  ['The rooster sings every morning.'],
+  ['The bunny eats a carrot.'],
+  ['The fairy lives in the forest.'],
+];
+
+const enLongSentences: Array<[string, string[]?]> = [
+  ['The girl found a key near the big tree.'],
+  ['The dog ran after the red ball.'],
+  ['The fox crossed the forest and found a river.'],
+  ['The butterfly landed on the yellow flower.'],
+  ['The pirate hid the treasure behind the rock.'],
+  ['The turtle walked slowly to the river.'],
+  ['The rocket flew up to the starry sky.'],
+  ['The boy put his toys inside the box.'],
+  ['The cat slept on the warm roof.'],
+  ['The owl opened its eyes when night came.'],
+];
+
 function slug(text: string): string {
   return text
     .toLowerCase()
@@ -96,34 +156,31 @@ function slug(text: string): string {
     .join('-');
 }
 
+function buildPrompts(
+  lang: Lang,
+  prefix: string,
+  entries: Array<[string, string[]?]>,
+  difficulty: 1 | 2 | 3,
+  type: 'word' | 'sentence',
+  extraTag?: string,
+): ReadingPrompt[] {
+  return entries.map(([text, tags]) => ({
+    id: `${prefix}-${slug(text)}`,
+    text,
+    lang,
+    difficulty,
+    type,
+    tags: extraTag ? [...(tags ?? []), extraTag] : tags,
+  }));
+}
+
 export const readingPrompts: ReadingPrompt[] = [
-  ...words.map(
-    ([text, tags]): ReadingPrompt => ({
-      id: `w-${slug(text)}`,
-      text,
-      difficulty: 1,
-      type: 'word',
-      tags,
-    }),
-  ),
-  ...shortSentences.map(
-    ([text, tags]): ReadingPrompt => ({
-      id: `s-${slug(text)}`,
-      text,
-      difficulty: 2,
-      type: 'sentence',
-      tags: [...(tags ?? []), 'short_sentence'],
-    }),
-  ),
-  ...longSentences.map(
-    ([text, tags]): ReadingPrompt => ({
-      id: `l-${slug(text)}`,
-      text,
-      difficulty: 3,
-      type: 'sentence',
-      tags: [...(tags ?? []), 'long_sentence'],
-    }),
-  ),
+  ...buildPrompts('pt', 'w', words, 1, 'word'),
+  ...buildPrompts('pt', 's', shortSentences, 2, 'sentence', 'short_sentence'),
+  ...buildPrompts('pt', 'l', longSentences, 3, 'sentence', 'long_sentence'),
+  ...buildPrompts('en', 'en-w', enWords, 1, 'word'),
+  ...buildPrompts('en', 'en-s', enShortSentences, 2, 'sentence', 'short_sentence'),
+  ...buildPrompts('en', 'en-l', enLongSentences, 3, 'sentence', 'long_sentence'),
 ];
 
 /**
@@ -136,10 +193,14 @@ const DIFFICULTY_SEQUENCE: Array<1 | 2 | 3> = [1, 1, 2, 2, 3];
  * Sorteia o próximo desafio: dificuldade conforme a posição na missão,
  * evitando repetir textos já lidos até esgotar o banco daquele nível.
  */
-export function getNextPrompt(completedPromptIds: string[], positionInMission: number): ReadingPrompt {
+export function getNextPrompt(
+  completedPromptIds: string[],
+  positionInMission: number,
+  lang: Lang,
+): ReadingPrompt {
   const difficulty =
     DIFFICULTY_SEQUENCE[Math.min(positionInMission, DIFFICULTY_SEQUENCE.length - 1)];
-  const ofDifficulty = readingPrompts.filter((p) => p.difficulty === difficulty);
+  const ofDifficulty = readingPrompts.filter((p) => p.difficulty === difficulty && p.lang === lang);
   const fresh = ofDifficulty.filter((p) => !completedPromptIds.includes(p.id));
   const pool = fresh.length > 0 ? fresh : ofDifficulty;
   return pool[Math.floor(Math.random() * pool.length)];

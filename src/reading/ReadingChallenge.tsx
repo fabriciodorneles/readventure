@@ -8,6 +8,8 @@ import type { SpeechSession } from './speechRecognition';
 import { defaultEvaluator } from './speechEvaluator';
 import type { ReadingResult } from './speechEvaluator';
 import { playSound } from '../audio/sounds';
+import { getStrings, speechLocale } from '../i18n/strings';
+import type { Lang } from '../i18n/strings';
 
 export type ChallengeDebugActions = {
   simulateSuccess: () => void;
@@ -26,6 +28,7 @@ type Status = 'ready' | 'listening' | 'success' | 'retry' | 'no-speech' | 'denie
 type ReadingChallengeProps = {
   prompt: ReadingPrompt;
   textCase: TextCasePreference;
+  lang: Lang;
   /** Emoji do recurso ganho nesta missão (🪵, 🌱, 💎...) */
   rewardEmoji: string;
   onSuccess: (promptId: string) => void;
@@ -34,22 +37,22 @@ type ReadingChallengeProps = {
   debugRef?: MutableRefObject<ChallengeDebugActions | null>;
 };
 
-const ENCOURAGEMENTS = ['CONSEGUIU!', 'BOA!', 'MUITO BEM!'];
-
 export function ReadingChallenge({
   prompt,
   textCase,
+  lang,
   rewardEmoji,
   onSuccess,
   onExit,
   onEvaluated,
   debugRef,
 }: ReadingChallengeProps) {
+  const t = getStrings(lang);
   const [status, setStatus] = useState<Status>('ready');
   const [attempt, setAttempt] = useState(0);
   const [heard, setHeard] = useState('');
   const [lastResult, setLastResult] = useState<ReadingResult | null>(null);
-  const [praise] = useState(() => ENCOURAGEMENTS[Math.floor(Math.random() * ENCOURAGEMENTS.length)]);
+  const [praise] = useState(() => Math.floor(Math.random() * 3));
   const sessionRef = useRef<SpeechSession | null>(null);
   const successTimer = useRef<number | undefined>(undefined);
 
@@ -89,19 +92,22 @@ export function ReadingChallenge({
     playSound('mic-on');
     setStatus('listening');
     setHeard('');
-    sessionRef.current = defaultRecognizer.listen({
-      onInterim: (text) => setHeard(text),
-      onResult: (transcript) => {
-        playSound('mic-off');
-        handleTranscript(transcript);
+    sessionRef.current = defaultRecognizer.listen(
+      {
+        onInterim: (text) => setHeard(text),
+        onResult: (transcript) => {
+          playSound('mic-off');
+          handleTranscript(transcript);
+        },
+        onError: (error) => {
+          if (error === 'no-speech') setStatus('no-speech');
+          else if (error === 'denied') setStatus('denied');
+          else if (error === 'unavailable') setStatus('unavailable');
+          else setStatus('no-speech');
+        },
       },
-      onError: (error) => {
-        if (error === 'no-speech') setStatus('no-speech');
-        else if (error === 'denied') setStatus('denied');
-        else if (error === 'unavailable') setStatus('unavailable');
-        else setStatus('no-speech');
-      },
-    });
+      speechLocale[lang],
+    );
   };
 
   // Ações de debug (simular leitura sem microfone)
@@ -158,39 +164,39 @@ export function ReadingChallenge({
       <div className="reading-feedback">
         {status === 'success' && (
           <div className="feedback success pop-in">
-            <span className="feedback-big">{praise}</span>
+            <span className="feedback-big">{t.praise[praise % t.praise.length]}</span>
             <span className="wood-reward">{rewardEmoji} +1</span>
           </div>
         )}
         {status === 'retry' && (
           <div className="feedback retry pop-in">
-            <span className="feedback-big">QUASE!</span>
-            <span className="feedback-small">VAMOS DE NOVO.</span>
+            <span className="feedback-big">{t.almost}</span>
+            <span className="feedback-small">{t.tryAgain}</span>
           </div>
         )}
         {status === 'no-speech' && (
           <div className="feedback retry pop-in">
-            <span className="feedback-big">NÃO OUVI...</span>
-            <span className="feedback-small">FALE PERTINHO! 🎤</span>
+            <span className="feedback-big">{t.didntHear}</span>
+            <span className="feedback-small">{t.speakClose}</span>
           </div>
         )}
         {status === 'listening' && (
           <div className="feedback listening-wrap">
-            <span className="feedback listening">ESTOU OUVINDO... 👂</span>
-            {heard && <span className="heard-text">{heard.toLocaleLowerCase('pt-BR')}</span>}
+            <span className="feedback listening">{t.listening}</span>
+            {heard && <span className="heard-text">{heard.toLocaleLowerCase(speechLocale[lang])}</span>}
           </div>
         )}
-        {status === 'ready' && <div className="feedback hint">TOQUE E LEIA EM VOZ ALTA</div>}
+        {status === 'ready' && <div className="feedback hint">{t.tapAndRead}</div>}
         {status === 'denied' && (
           <div className="feedback problem">
-            <span className="feedback-small">O MICROFONE ESTÁ BLOQUEADO.</span>
-            <span className="feedback-tiny">(peça para um adulto liberar o microfone no navegador)</span>
+            <span className="feedback-small">{t.micBlocked}</span>
+            <span className="feedback-tiny">{t.micBlockedHint}</span>
           </div>
         )}
         {status === 'unavailable' && (
           <div className="feedback problem">
-            <span className="feedback-small">ESTE NAVEGADOR NÃO TEM MICROFONE MÁGICO.</span>
-            <span className="feedback-tiny">(experimente o Chrome ou o Edge)</span>
+            <span className="feedback-small">{t.noSpeechApi}</span>
+            <span className="feedback-tiny">{t.noSpeechApiHint}</span>
           </div>
         )}
       </div>
